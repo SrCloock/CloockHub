@@ -71,7 +71,10 @@ export default function TikTokPage() {
   };
 
   const pollStatus = (publishId) => {
+    const maxAttempts = 40; // ~2 minutos
+    let attempts = 0;
     const interval = setInterval(async () => {
+      attempts += 1;
       const res = await fetch(`/api/tiktok/post/status?publish_id=${publishId}`);
       const data = await res.json();
       if (data.status) {
@@ -79,7 +82,16 @@ export default function TikTokPage() {
         if (data.status === 'PUBLISH_COMPLETE' || data.status === 'FAILED') {
           clearInterval(interval);
           setSubmitting(false);
+          return;
         }
+      }
+      if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        setSubmitting(false);
+        setBanner({
+          type: 'error',
+          text: 'Esto está tardando más de lo normal. Puede que el vídeo sea demasiado grande o haya un problema en TikTok — revisa el estado en tu app de TikTok o inténtalo con un vídeo más corto/comprimido.',
+        });
       }
     }, 3000);
   };

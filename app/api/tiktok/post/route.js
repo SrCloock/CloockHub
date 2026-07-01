@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
-import { initVideoPost, uploadVideoChunk } from '../../../../lib/tiktok';
+import { initVideoPost, uploadVideoChunks, planChunks } from '../../../../lib/tiktok';
+
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export async function POST(request) {
   const accessToken = request.cookies.get('tt_access_token')?.value;
@@ -22,17 +25,20 @@ export async function POST(request) {
   try {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+    const { chunkSize, totalChunkCount } = planChunks(buffer.length);
 
     const init = await initVideoPost(accessToken, {
       title,
       privacyLevel,
       videoSize: buffer.length,
+      chunkSize,
+      totalChunkCount,
       disableComment,
       disableDuet,
       disableStitch,
     });
 
-    await uploadVideoChunk(init.upload_url, buffer, file.type);
+    await uploadVideoChunks(init.upload_url, buffer, file.type, chunkSize, totalChunkCount);
 
     return NextResponse.json({ publishId: init.publish_id });
   } catch (e) {
