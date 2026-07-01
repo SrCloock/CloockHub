@@ -23,6 +23,8 @@ export default function TikTokPage() {
   const [disableComment, setDisableComment] = useState(false);
   const [disableDuet, setDisableDuet] = useState(false);
   const [disableStitch, setDisableStitch] = useState(false);
+  const [contentType, setContentType] = useState('');
+  const [musicConfirmed, setMusicConfirmed] = useState(false);
   const [file, setFile] = useState(null);
   const [publishStatus, setPublishStatus] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -53,6 +55,9 @@ export default function TikTokPage() {
               } else if (info.privacy_level_options?.length) {
                 setPrivacyLevel(info.privacy_level_options[0]);
               }
+              setDisableComment(!!info.comment_disabled);
+              setDisableDuet(!!info.duet_disabled);
+              setDisableStitch(!!info.stitch_disabled);
             });
           fetch('/api/tiktok/videos')
             .then((r) => r.json().then((data) => ({ ok: r.ok, data })))
@@ -103,6 +108,14 @@ export default function TikTokPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file || !title || !privacyLevel) return;
+    if (!contentType) {
+      setBanner({ type: 'error', text: 'Indica si el contenido es propio o promocional.' });
+      return;
+    }
+    if (!musicConfirmed) {
+      setBanner({ type: 'error', text: 'Debes confirmar que tienes los derechos de la música/audio del vídeo.' });
+      return;
+    }
     setSubmitting(true);
     setPublishStatus('PROCESSING_UPLOAD');
 
@@ -117,6 +130,7 @@ export default function TikTokPage() {
           disableComment,
           disableDuet,
           disableStitch,
+          contentType,
         }),
       });
       const initData = await initRes.json();
@@ -235,17 +249,47 @@ export default function TikTokPage() {
                     </div>
                   )}
                   <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <input type="checkbox" checked={disableComment} onChange={(e) => setDisableComment(e.target.checked)} />
-                    Desactivar comentarios
+                    <input
+                      type="checkbox"
+                      checked={disableComment}
+                      disabled={creatorInfo?.comment_disabled}
+                      onChange={(e) => setDisableComment(e.target.checked)}
+                    />
+                    Desactivar comentarios {creatorInfo?.comment_disabled && '(ya desactivado en tu cuenta)'}
                   </label>
                   <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <input type="checkbox" checked={disableDuet} onChange={(e) => setDisableDuet(e.target.checked)} />
-                    Desactivar dúo
+                    <input
+                      type="checkbox"
+                      checked={disableDuet}
+                      disabled={creatorInfo?.duet_disabled}
+                      onChange={(e) => setDisableDuet(e.target.checked)}
+                    />
+                    Desactivar dúo {creatorInfo?.duet_disabled && '(ya desactivado en tu cuenta)'}
                   </label>
                   <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <input type="checkbox" checked={disableStitch} onChange={(e) => setDisableStitch(e.target.checked)} />
-                    Desactivar stitch
+                    <input
+                      type="checkbox"
+                      checked={disableStitch}
+                      disabled={creatorInfo?.stitch_disabled}
+                      onChange={(e) => setDisableStitch(e.target.checked)}
+                    />
+                    Desactivar stitch {creatorInfo?.stitch_disabled && '(ya desactivado en tu cuenta)'}
                   </label>
+
+                  <div>
+                    <label htmlFor="contentType">Tipo de contenido</label>
+                    <select id="contentType" value={contentType} onChange={(e) => setContentType(e.target.value)} required>
+                      <option value="" disabled>Selecciona una opción…</option>
+                      <option value="organic">Contenido propio (orgánico)</option>
+                      <option value="branded">Contenido promocional / de marca</option>
+                    </select>
+                  </div>
+
+                  <label style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <input type="checkbox" checked={musicConfirmed} onChange={(e) => setMusicConfirmed(e.target.checked)} />
+                    <span>Confirmo que tengo los derechos necesarios de la música/audio de este vídeo, según los Términos de Música de TikTok.</span>
+                  </label>
+
                   <button type="submit" className="btn btn-gold" style={{ border: 'none' }} disabled={submitting}>
                     {submitting ? 'Publicando…' : 'Publicar en TikTok'}
                   </button>

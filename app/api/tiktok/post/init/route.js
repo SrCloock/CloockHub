@@ -10,10 +10,16 @@ export async function POST(request) {
   }
 
   const body = await request.json().catch(() => null);
-  const { title, privacyLevel, videoSize, disableComment, disableDuet, disableStitch } = body || {};
+  const { title, privacyLevel, videoSize, disableComment, disableDuet, disableStitch, contentType } = body || {};
 
   if (!title || !privacyLevel || !videoSize) {
     return NextResponse.json({ error: 'Faltan campos obligatorios (título, privacidad o tamaño del vídeo).' }, { status: 400 });
+  }
+  if (contentType !== 'organic' && contentType !== 'branded') {
+    return NextResponse.json({ error: 'Debes indicar si el contenido es propio o promocional.' }, { status: 400 });
+  }
+  if (contentType === 'branded' && privacyLevel === 'SELF_ONLY') {
+    return NextResponse.json({ error: 'El contenido de marca no se puede publicar como privado. Esto requiere que tu app esté auditada.' }, { status: 400 });
   }
 
   try {
@@ -27,6 +33,8 @@ export async function POST(request) {
       disableComment,
       disableDuet,
       disableStitch,
+      brandOrganicToggle: contentType === 'organic',
+      brandContentToggle: contentType === 'branded',
     });
 
     return NextResponse.json({
