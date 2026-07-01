@@ -102,22 +102,51 @@ export default function TikTokPage() {
     setSubmitting(true);
     setPublishStatus('PROCESSING_UPLOAD');
 
-    const formData = new FormData();
-    formData.append('video', file);
-    formData.append('title', title);
-    formData.append('privacyLevel', privacyLevel);
-    formData.append('disableComment', String(disableComment));
-    formData.append('disableDuet', String(disableDuet));
-    formData.append('disableStitch', String(disableStitch));
+    try {
+      const initRes = await fetch('/api/tiktok/post/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          privacyLevel,
+          videoSize: file.size,
+          disableComment,
+          disableDuet,
+          disableStitch,
+        }),
+      });
+      const initData = await initRes.json();
+      if (!initRes.ok) throw new Error(initData.error || 'Error al iniciar la publicación.');
 
-    const res = await fetch('/api/tiktok/post', { method: 'POST', body: formData });
-    const data = await res.json();
-    if (!res.ok) {
-      setBanner({ type: 'error', text: data.error || 'Error al publicar.' });
+      const { publishId, uploadUrl, chunkSize, totalChunkCount } = initData;
+
+      for (let i = 0; i < totalChunkCount; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, file.size) - 1;
+        const chunk = file.slice(start, end + 1);
+
+        let uploadRes;
+        try {
+          uploadRes = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': file.type || 'video/mp4',
+              'Content-Range': `bytes ${start}-${end}/${file.size}`,
+            },
+            body: chunk,
+          });
+        } catch {
+          throw new Error('No se pudo subir el vídeo directamente a TikTok (posible bloqueo de CORS del navegador).');
+        }
+        if (!uploadRes.ok) throw new Error(`Fallo al subir el fragmento ${i + 1}/${totalChunkCount} a TikTok.`);
+      }
+
+      pollStatus(publishId);
+    } catch (err) {
+      setBanner({ type: 'error', text: err.message });
       setSubmitting(false);
-      return;
+      setPublishStatus(null);
     }
-    pollStatus(data.publishId);
   };
 
   return (
