@@ -18,9 +18,11 @@ export async function GET(request) {
   };
 
   if (error) return redirectTo(`/tiktok?error=${encodeURIComponent(error)}`);
-  if (!code || !state || state !== cookieState || !codeVerifier) {
-    return redirectTo('/tiktok?error=invalid_state');
-  }
+  if (!code) return redirectTo('/tiktok?error=missing_code');
+  if (!state) return redirectTo('/tiktok?error=missing_state_param');
+  if (!cookieState) return redirectTo('/tiktok?error=missing_state_cookie');
+  if (!codeVerifier) return redirectTo('/tiktok?error=missing_verifier_cookie');
+  if (state !== cookieState) return redirectTo('/tiktok?error=state_mismatch');
 
   try {
     const token = await exchangeCodeForToken({ code, codeVerifier });
@@ -30,7 +32,7 @@ export async function GET(request) {
     res.cookies.set('tt_refresh_token', token.refresh_token, { ...cookieOpts, maxAge: token.refresh_expires_in });
     res.cookies.set('tt_open_id', token.open_id, { ...cookieOpts, maxAge: token.refresh_expires_in });
     return res;
-  } catch {
-    return redirectTo('/tiktok?error=token_exchange_failed');
+  } catch (e) {
+    return redirectTo(`/tiktok?error=${encodeURIComponent('token_exchange_failed: ' + e.message)}`);
   }
 }

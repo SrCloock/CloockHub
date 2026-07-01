@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { buildAuthorizeUrl, generatePkcePair, isTiktokConfigured } from '../../../../lib/tiktok';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   if (!isTiktokConfigured()) {
     return NextResponse.json({ error: 'TikTok no configurado todavía.' }, { status: 503 });
