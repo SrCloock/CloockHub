@@ -1,30 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { motion } from 'framer-motion';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Reveal from './components/Reveal';
 
 export default function Home() {
-  const [navOpen, setNavOpen] = useState(false);
-  const year = new Date().getFullYear();
-
   return (
     <>
-      <header>
-        <nav>
-          <div className="logo">SR<span>CLOOCK</span></div>
-          <button className="navtoggle" aria-label="Abrir menú" onClick={() => setNavOpen(!navOpen)}>☰</button>
-          <div className={`navlinks ${navOpen ? 'open' : ''}`}>
-            <a href="#sobre-mi" onClick={() => setNavOpen(false)}>Sobre mí</a>
-            <a href="#proyectos" onClick={() => setNavOpen(false)}>Proyectos</a>
-            <a href="#tienda" onClick={() => setNavOpen(false)}>Tienda</a>
-            <a href="#redes" onClick={() => setNavOpen(false)}>Redes</a>
-            <a href="#contacto" onClick={() => setNavOpen(false)}>Contacto</a>
-          </div>
-        </nav>
-      </header>
+      <Header />
 
       <section className="hero">
         <div className="hero-inner">
-          <svg className="shard" viewBox="0 0 64 88" xmlns="http://www.w3.org/2000/svg">
+          <motion.svg
+            className="shard"
+            viewBox="0 0 64 88"
+            xmlns="http://www.w3.org/2000/svg"
+            initial={{ opacity: 0, scale: 0.8, y: -12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
             <defs>
               <linearGradient id="shardGrad" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#f0c987" />
@@ -34,16 +29,43 @@ export default function Home() {
             </defs>
             <polygon points="32,2 56,28 44,86 20,86 8,28" fill="url(#shardGrad)" opacity="0.92" />
             <polygon points="32,2 56,28 32,40 8,28" fill="#ffffff" opacity="0.18" />
-          </svg>
-          <h1>SrCloock</h1>
-          <p className="tag">// donde Piltover se encuentra con Zaun</p>
-          <p style={{ marginTop: 18, color: 'var(--text-dim)' }}>
+          </motion.svg>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          >
+            SrCloock
+          </motion.h1>
+
+          <motion.p
+            className="tag"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            // desarrollo, diseño y contenido bajo un mismo sello
+          </motion.p>
+
+          <motion.p
+            style={{ marginTop: 18, color: 'var(--text-dim)' }}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          >
             Proyectos, apps y un universo propio — placeholder de descripción, cámbiame por tu bio real.
-          </p>
-          <div className="hero-cta">
+          </motion.p>
+
+          <motion.div
+            className="hero-cta"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
             <a href="#proyectos" className="btn btn-gold">Ver proyectos</a>
             <a href="#redes" className="btn btn-ghost">Síguenos</a>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -60,72 +82,69 @@ export default function Home() {
 
       <section id="sobre-mi" className="alt">
         <div className="wrap">
-          <div className="section-head">
-            <span className="eyebrow">// el creador</span>
-            <h2>Sobre mí</h2>
-          </div>
-          <div className="about-grid">
-            <div className="about-portrait">[ tu foto o avatar aquí ]</div>
-            <div className="about-text">
-              <p>Placeholder: cuéntale a la gente quién eres, qué construyes y por qué. Dos o tres frases bastan — directas, con tu voz.</p>
-              <p>Placeholder: menciona tu enfoque (apps, diseño, contenido...) y qué pueden esperar al seguirte.</p>
+          <Reveal>
+            <div className="section-head">
+              <span className="eyebrow">// el creador</span>
+              <h2>Sobre mí</h2>
             </div>
-          </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="about-grid">
+              <div className="about-portrait">[ tu foto o avatar aquí ]</div>
+              <div className="about-text">
+                <p>Placeholder: cuéntale a la gente quién eres, qué construyes y por qué. Dos o tres frases bastan — directas, con tu voz.</p>
+                <p>Placeholder: menciona tu enfoque (apps, diseño, contenido...) y qué pueden esperar al seguirte.</p>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
       <section id="proyectos">
         <div className="wrap">
-          <div className="section-head">
-            <span className="eyebrow">// hextech lab</span>
-            <h2>Proyectos & Apps</h2>
-          </div>
+          <Reveal>
+            <div className="section-head">
+              <span className="eyebrow">// laboratorio</span>
+              <h2>Proyectos & Apps</h2>
+            </div>
+          </Reveal>
           <div className="grid3">
             {[
               { tag: 'App', title: 'Nombre del proyecto 1' },
               { tag: 'Web', title: 'Nombre del proyecto 2' },
               { tag: 'Tool', title: 'Nombre del proyecto 3' },
-            ].map((p) => (
-              <div className="card" key={p.title}>
-                <span className="tagchip">{p.tag}</span>
-                <h3>{p.title}</h3>
-                <p>Descripción breve placeholder de qué hace esta app o proyecto.</p>
-                <a href="#" className="cta">Ver más →</a>
-              </div>
+            ].map((p, i) => (
+              <Reveal delay={i * 0.1} key={p.title}>
+                <div className="card">
+                  <span className="tagchip">{p.tag}</span>
+                  <h3>{p.title}</h3>
+                  <p>Descripción breve placeholder de qué hace esta app o proyecto.</p>
+                  <a href="#" className="cta">Ver más →</a>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="tienda" className="alt">
+      <section id="redes" className="alt">
         <div className="wrap">
-          <div className="section-head">
-            <span className="eyebrow">// arsenal</span>
-            <h2>Tienda</h2>
-          </div>
-          <div className="grid3">
-            {[
-              { title: 'Producto 1', price: '19,99 €' },
-              { title: 'Producto 2', price: '24,99 €' },
-              { title: 'Producto 3', price: '14,99 €' },
-            ].map((p) => (
-              <div className="card" key={p.title}>
-                <span className="tagchip">Merch</span>
-                <h3>{p.title}</h3>
-                <p className="price">{p.price}</p>
-                <a href="#" className="cta">Comprar →</a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+          <Reveal>
+            <div className="section-head">
+              <span className="eyebrow">// transmisión</span>
+              <h2>Redes & streaming</h2>
+            </div>
+          </Reveal>
 
-      <section id="redes">
-        <div className="wrap">
-          <div className="section-head">
-            <span className="eyebrow">// transmisión</span>
-            <h2>Redes sociales</h2>
-          </div>
+          <Reveal delay={0.05}>
+            <div className="stream-card">
+              <span className="tagchip">Último directo</span>
+              <h3>[ título del último stream / vídeo aquí ]</h3>
+              <p>Placeholder: incrusta aquí el último VOD de Twitch/YouTube o enlázalo directamente.</p>
+              <a href="#" className="cta">Ver ahora →</a>
+            </div>
+          </Reveal>
+
           <div className="social-grid">
             {[
               { name: 'X / Twitter', handle: '@srcloock' },
@@ -134,44 +153,19 @@ export default function Home() {
               { name: 'Twitch', handle: '/srcloock' },
               { name: 'TikTok', handle: '@srcloock' },
               { name: 'Discord', handle: 'Únete' },
-            ].map((s) => (
-              <a href="#" className="social-item" key={s.name}>
-                {s.name}
-                <span className="platform">{s.handle}</span>
-              </a>
+            ].map((s, i) => (
+              <Reveal delay={i * 0.06} key={s.name}>
+                <a href="#" className="social-item">
+                  {s.name}
+                  <span className="platform">{s.handle}</span>
+                </a>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="contacto" className="alt">
-        <div className="wrap">
-          <div className="section-head">
-            <span className="eyebrow">// línea directa</span>
-            <h2>Contacto</h2>
-          </div>
-          <form onSubmit={(e) => e.preventDefault()}>
-            <div>
-              <label htmlFor="nombre">Nombre</label>
-              <input id="nombre" type="text" placeholder="Tu nombre" />
-            </div>
-            <div>
-              <label htmlFor="email">Email</label>
-              <input id="email" type="email" placeholder="tu@email.com" />
-            </div>
-            <div>
-              <label htmlFor="mensaje">Mensaje</label>
-              <textarea id="mensaje" placeholder="Escribe aquí..." />
-            </div>
-            <button type="submit" className="btn btn-gold" style={{ border: 'none' }}>Enviar mensaje</button>
-            <p className="form-note">Este formulario aún no envía nada — se conecta a una API route propia o a Formspree más adelante.</p>
-          </form>
-        </div>
-      </section>
-
-      <footer>
-        © {year} SrCloock — todos los derechos reservados.
-      </footer>
+      <Footer />
     </>
   );
 }

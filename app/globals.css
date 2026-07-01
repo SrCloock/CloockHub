@@ -105,6 +105,16 @@ section{padding:90px 24px; position:relative;}
 .section-head{margin-bottom:48px; text-align:center;}
 .section-head h2{font-size:clamp(1.8rem,4vw,2.4rem); margin-top:8px;}
 .alt{background:var(--bg-alt);}
+.page-section{padding-top:140px; min-height:calc(100vh - 200px);}
+
+/* stream highlight */
+.stream-card{
+  background:var(--bg-card); border:1px solid var(--line); border-radius:8px;
+  padding:28px; max-width:640px; margin:0 auto 40px; text-align:center;
+}
+.stream-card h3{font-size:1.15rem; margin:10px 0 8px;}
+.stream-card p{color:var(--text-dim); font-size:.92rem; margin-bottom:16px;}
+.stream-card a.cta{font-family:'JetBrains Mono',monospace; font-size:.82rem; color:var(--gold-soft); border-bottom:1px solid var(--gold-soft); padding-bottom:2px;}
 
 /* about */
 .about-grid{display:grid; grid-template-columns:220px 1fr; gap:48px; align-items:center; max-width:880px; margin:0 auto;}
