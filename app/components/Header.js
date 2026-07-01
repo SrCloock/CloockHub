@@ -9,6 +9,7 @@ const LINKS = [
   { href: '#proyectos', label: 'Proyectos' },
   { href: '#redes', label: 'Redes' },
   { href: '/tienda', label: 'Tienda' },
+  { href: '/tiktok', label: 'TikTok' },
   { href: '/contacto', label: 'Contacto' },
 ];
 

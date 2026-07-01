@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Reveal from './components/Reveal';
+import SocialSection from './components/SocialSection';
 
 export default function Home() {
   return (
@@ -136,32 +137,7 @@ export default function Home() {
             </div>
           </Reveal>
 
-          <Reveal delay={0.05}>
-            <div className="stream-card">
-              <span className="tagchip">Último directo</span>
-              <h3>[ título del último stream / vídeo aquí ]</h3>
-              <p>Placeholder: incrusta aquí el último VOD de Twitch/YouTube o enlázalo directamente.</p>
-              <a href="#" className="cta">Ver ahora →</a>
-            </div>
-          </Reveal>
-
-          <div className="social-grid">
-            {[
-              { name: 'X / Twitter', handle: '@srcloock' },
-              { name: 'Instagram', handle: '@srcloock' },
-              { name: 'YouTube', handle: '/srcloock' },
-              { name: 'Twitch', handle: '/srcloock' },
-              { name: 'TikTok', handle: '@srcloock' },
-              { name: 'Discord', handle: 'Únete' },
-            ].map((s, i) => (
-              <Reveal delay={i * 0.06} key={s.name}>
-                <a href="#" className="social-item">
-                  {s.name}
-                  <span className="platform">{s.handle}</span>
-                </a>
-              </Reveal>
-            ))}
-          </div>
+          <SocialSection />
         </div>
       </section>
 
