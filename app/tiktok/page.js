@@ -41,14 +41,24 @@ export default function TikTokPage() {
         setMe(data);
         if (data.connected) {
           fetch('/api/tiktok/creator-info')
-            .then((r) => r.json())
-            .then((info) => {
+            .then((r) => r.json().then((info) => ({ ok: r.ok, info })))
+            .then(({ ok, info }) => {
+              if (!ok) {
+                setBanner({ type: 'error', text: `No se pudo cargar creator-info: ${info.error}` });
+                return;
+              }
               setCreatorInfo(info);
               if (info.privacy_level_options?.length) setPrivacyLevel(info.privacy_level_options[0]);
             });
           fetch('/api/tiktok/videos')
-            .then((r) => r.json())
-            .then((data) => setVideos(data.videos || []));
+            .then((r) => r.json().then((data) => ({ ok: r.ok, data })))
+            .then(({ ok, data }) => {
+              if (!ok) {
+                setBanner({ type: 'error', text: `No se pudieron cargar los vídeos: ${data.error}` });
+                return;
+              }
+              setVideos(data.videos || []);
+            });
         }
       });
   }, []);
@@ -118,6 +128,7 @@ export default function TikTokPage() {
                 <h3>Conecta tu cuenta de TikTok</h3>
                 <p>Inicia sesión para ver tu perfil, tus vídeos y publicar contenido nuevo.</p>
                 <a href="/api/tiktok/login" className="btn btn-gold">Conectar con TikTok</a>
+                {me.error && <p className="form-note form-note-error" style={{ marginTop: 16 }}>Error: {me.error}</p>}
               </div>
             </Reveal>
           )}
@@ -132,7 +143,6 @@ export default function TikTokPage() {
                   )}
                   <div style={{ flex: 1 }}>
                     <h3 style={{ margin: 0 }}>{me.user?.display_name}</h3>
-                    <p style={{ margin: 0 }}>@{me.user?.username}</p>
                   </div>
                   <button className="btn btn-ghost" onClick={handleLogout} type="button">Desconectar</button>
                 </div>
