@@ -48,7 +48,11 @@ export default function TikTokPage() {
                 return;
               }
               setCreatorInfo(info);
-              if (info.privacy_level_options?.length) setPrivacyLevel(info.privacy_level_options[0]);
+              if (info.privacy_level_options?.includes('SELF_ONLY')) {
+                setPrivacyLevel('SELF_ONLY');
+              } else if (info.privacy_level_options?.length) {
+                setPrivacyLevel(info.privacy_level_options[0]);
+              }
             });
           fetch('/api/tiktok/videos')
             .then((r) => r.json().then((data) => ({ ok: r.ok, data })))
@@ -217,10 +221,17 @@ export default function TikTokPage() {
                     <div>
                       <label htmlFor="privacy">Privacidad</label>
                       <select id="privacy" value={privacyLevel} onChange={(e) => setPrivacyLevel(e.target.value)}>
-                        {creatorInfo.privacy_level_options.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
-                        ))}
+                        {creatorInfo.privacy_level_options.includes('SELF_ONLY') ? (
+                          <option value="SELF_ONLY">SELF_ONLY (privado, solo tú)</option>
+                        ) : (
+                          creatorInfo.privacy_level_options.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))
+                        )}
                       </select>
+                      <p className="form-note">
+                        Tu app aún no está auditada por TikTok, así que solo puedes publicar en modo privado (SELF_ONLY) hasta que se apruebe la revisión.
+                      </p>
                     </div>
                   )}
                   <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
