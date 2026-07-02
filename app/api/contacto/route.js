@@ -6,9 +6,20 @@ export async function POST(request) {
   const nombre = body?.nombre?.trim();
   const email = body?.email?.trim();
   const mensaje = body?.mensaje?.trim();
+  const honeypot = body?.empresa?.trim();
+
+  // Campo trampa: los humanos nunca lo rellenan, los bots automáticos sí.
+  // Se responde ok para no delatar el mecanismo al bot.
+  if (honeypot) {
+    return NextResponse.json({ ok: true });
+  }
 
   if (!nombre || !email || !mensaje) {
     return NextResponse.json({ error: 'Faltan campos obligatorios.' }, { status: 400 });
+  }
+
+  if (nombre.length > 200 || email.length > 200 || mensaje.length > 5000) {
+    return NextResponse.json({ error: 'Alguno de los campos supera el tamaño máximo permitido.' }, { status: 400 });
   }
 
   const supabase = getSupabaseServerClient();

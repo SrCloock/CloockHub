@@ -54,6 +54,14 @@ export default function LiveWidget() {
     ? `https://player.twitch.tv/?channel=${TWITCH_LOGIN}&parent=${hostname}&autoplay=true&muted=true`
     : null;
 
+  const bounds = {
+    left: -(window.innerWidth - 300 - 8),
+    right: 8,
+    top: -(80 - 8),
+    bottom: window.innerHeight - 210 - 80,
+  };
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
   const handleKeyDown = (e) => {
     const deltas = {
       ArrowUp: [0, -NUDGE],
@@ -64,8 +72,8 @@ export default function LiveWidget() {
     const delta = deltas[e.key];
     if (!delta) return;
     e.preventDefault();
-    x.set(x.get() + delta[0]);
-    y.set(y.get() + delta[1]);
+    x.set(clamp(x.get() + delta[0], bounds.left, bounds.right));
+    y.set(clamp(y.get() + delta[1], bounds.top, bounds.bottom));
   };
 
   return (
@@ -99,6 +107,7 @@ export default function LiveWidget() {
           dragControls={dragControls}
           dragMomentum={false}
           dragElastic={0}
+          dragConstraints={bounds}
           initial={{ scale: 0.85, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.85, opacity: 0 }}

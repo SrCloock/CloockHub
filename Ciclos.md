@@ -229,3 +229,379 @@ cambió, en concreto).
 - Verificado con `npm run build`.
 
 ---
+
+## Ciclo 6 — Navegación (header y menú móvil)
+
+### PREVIA
+- El botón de menú móvil (`.navtoggle`) tenía `aria-label="Abrir menú"` fijo,
+  sin cambiar nunca a "Cerrar menú" cuando el panel ya estaba abierto, y sin
+  `aria-expanded` ni `aria-controls` — un lector de pantalla no tenía forma
+  de saber si el menú estaba desplegado o no.
+- El icono del botón era siempre "☰": al abrir el menú no cambiaba a una
+  "✕" ni ningún otro indicador visual — para un usuario vidente que lo pulsa,
+  no hay confirmación en el propio botón de que hizo algo (solo se nota si
+  mira el panel que aparece debajo).
+- El menú móvil no se cerraba con `Escape` ni al pulsar fuera de él — solo
+  se cerraba al elegir un enlace o volver a pulsar el botón.
+
+### Cambios
+- `Header.js`: `aria-expanded={navOpen}`, `aria-controls="site-nav"` en el
+  botón, `id="site-nav"` en el panel, y `aria-label` dinámico
+  ("Abrir menú" / "Cerrar menú").
+- El icono del botón cambia entre "☰" y "✕" según `navOpen`.
+- Cierre con `Escape` y al hacer click fuera del `<nav>` (listener global
+  solo activo mientras el menú está abierto, para no penalizar el resto de
+  la página).
+
+### POSTERIOR
+- El estado del menú móvil ahora es anunciable por un lector de pantalla
+  (`aria-expanded`/`aria-controls`) y visualmente confirmado en el propio
+  icono del botón.
+- El menú se puede cerrar sin tener que encontrar de nuevo el botón exacto:
+  `Escape` o click fuera funcionan.
+- No verificado con lector de pantalla real, igual que en el Ciclo 5.
+- Verificado con `npm run build`.
+
+---
+
+## Ciclo 7 — Página de TikTok: expuesta en el nav público sin control de dueño
+
+### PREVIA
+- `/tiktok` no es una feature para visitantes: es el panel del propio
+  SrCloock para conectar su cuenta y publicar vídeos directamente desde la
+  web (sube el archivo, llama a la Content Posting API de TikTok). Pese a
+  eso, estaba enlazada en el menú principal (`Header.js`) igual que
+  "Tienda" o "Contacto".
+- Hallazgo de fondo más serio: el flujo OAuth (`login`/`callback`) está bien
+  implementado (PKCE + `state`, cookies `httpOnly`+`secure`), pero **no
+  comprueba en ningún momento que quien se conecta sea el dueño del
+  sitio**. Cualquier visitante que llegue a `/tiktok` puede pulsar
+  "Conectar con TikTok", autenticarse con **su propia cuenta** y usar el
+  formulario para publicar vídeos a través de la app de TikTok registrada
+  por SrCloock. No compromete la cuenta de SrCloock (cada visitante solo
+  controla su propio token, en su propia cookie), pero convierte sin
+  querer una herramienta personal en un "subidor de vídeos a TikTok
+  gratis para cualquiera", fuera del propósito declarado de la
+  integración — y es el tipo de uso que las plataformas suelen revisar al
+  auditar una app.
+- Bug de UX de bajo nivel: si TikTok no está configurado en el servidor
+  (faltan `TIKTOK_CLIENT_KEY`/`SECRET`/`REDIRECT_URI`), el botón "Conectar
+  con TikTok" es un `<a href="/api/tiktok/login">` normal; esa ruta
+  devuelve un JSON de error plano (503), así que el visitante vería un
+  JSON crudo en el navegador en vez de un mensaje entendible.
+
+### Cambios
+- Quitado el enlace "TikTok" del menú principal (`Header.js`): sigue
+  siendo accesible por URL directa para SrCloock, pero deja de ofrecerse
+  como sección más de la web a cualquier visitante.
+- `GET /api/tiktok/me` ahora también devuelve `configured:
+  isTiktokConfigured()`. La página usa ese dato para mostrar un aviso
+  ("La integración con TikTok no está configurada todavía") en vez de un
+  enlace que aterriza en JSON crudo cuando falta configurar las claves.
+
+### No implementado — decisión pendiente del usuario
+- **No he añadido ningún control de acceso al flujo de conexión/publicación.**
+  Restringirlo solo al dueño requeriría un mecanismo de autenticación
+  propio (contraseña compartida por variable de entorno, allowlist del
+  `open_id` de TikTok tras el primer login, etc.) y una credencial que yo
+  no puedo inventar ni configurar en Vercel por mi cuenta. Lo dejo
+  documentado aquí como el hallazgo más importante de este ciclo para que
+  se decida conscientemente: o se gatea el acceso, o se asume que es un
+  uso aceptable tal cual.
+
+### POSTERIOR
+- El nav público ya no ofrece la herramienta de gestión de TikTok como si
+  fuera una sección de contenido más.
+- Si falta configurar TikTok en el servidor, el visitante que sí llegue a
+  `/tiktok` ve un aviso legible en vez de JSON crudo.
+- El problema de fondo (cualquiera puede conectar su propia cuenta y
+  publicar a través de la app) sigue abierto — ver nota anterior.
+- Verificado con `npm run build`.
+
+---
+
+## Ciclo 8 — Tienda: botón "Comprar" que no compra nada
+
+### PREVIA
+- Cada producto de `app/tienda/page.js` mostraba un botón "Comprar →" con
+  `href="#"` — no es solo un placeholder de copy (eso ya se acordó dejarlo
+  pendiente), es una **acción que aparenta funcionar y no hace nada**: un
+  visitante real que pulse ese botón esperando ir a pagar solo verá la
+  página saltar al principio. Esto entra directamente en la prioridad 2 del
+  criterio de ciclos (datos/resultados engañosos), no en "falta contenido".
+
+### Cambios
+- `PRODUCTS` pasa a admitir un campo `url` opcional por producto.
+- Si un producto tiene `url`, el CTA es un enlace real (`target="_blank"`)
+  que lleva a esa pasarela/ficha de compra.
+- Si no tiene `url` (como ahora, mientras no haya tienda real conectada),
+  el CTA se sustituye por un estado honesto: "Próximamente" sin `href`,
+  visualmente atenuado (`aria-disabled`), en vez de un enlace que finge
+  funcionar.
+
+### POSTERIOR
+- Ya no hay ningún botón en la web que aparente ser una acción de compra
+  real y no lleve a ningún sitio. En cuanto haya URLs de producto reales,
+  basta con añadir el campo `url` a cada entrada de `PRODUCTS` para que el
+  botón pase a funcionar solo, sin tocar el JSX.
+- Verificado con `npm run build`.
+
+---
+
+## Ciclo 9 — Metadata real por página (título/descripción/robots)
+
+### PREVIA
+- Solo `privacidad` y `terminos` tenían `export const metadata` propio. La
+  home, `/tienda`, `/contacto` y `/tiktok` heredaban el título y la
+  descripción genéricos del layout raíz ("SrCloock" / "streaming, contenido
+  y tienda") — en la pestaña del navegador, en resultados de Google y al
+  compartir el link, todas las páginas se veían y describían igual, sin
+  forma de distinguirlas.
+- Motivo técnico de por qué no se había hecho ya: esos cuatro `page.js`
+  eran Client Components (`'use client'` en la primera línea), y Next.js no
+  permite exportar `metadata` desde un Client Component — hacía falta
+  separar la UI interactiva de la exportación de metadata.
+
+### Cambios
+- Cada uno de esos cuatro `page.js` se dividió en dos archivos: la UI
+  interactiva se movió tal cual a un componente cliente
+  (`HomeClient.js`, `TiendaClient.js`, `ContactoClient.js`,
+  `TiktokClient.js`), y el nuevo `page.js` de cada ruta es un Server
+  Component que solo exporta `metadata` y renderiza el cliente.
+- Título y descripción propios para home, tienda y contacto.
+- `/tiktok` recibe además `robots: { index: false, follow: false }` — dado
+  el hallazgo del Ciclo 7 (es una herramienta de gestión personal, no una
+  página pensada para visitantes ni para buscadores), y se ha quitado de
+  `app/sitemap.js` por el mismo motivo.
+
+### POSTERIOR
+- Cada página tiene ahora su propio título/descripción reales: se nota en
+  la pestaña del navegador, en resultados de búsqueda y al compartir cada
+  URL por separado.
+- `/tiktok` queda explícitamente fuera del sitemap y marcada como
+  `noindex`, coherente con no ofrecerla ya en el menú público.
+- No se ha tocado ningún comportamiento de UI: el refactor solo mueve dónde
+  vive el JSX, no cambia lo que renderiza.
+- Verificado con `npm run build` (21 rutas generadas sin error).
+
+---
+
+## Ciclo 10 — Accesibilidad y consistencia del formulario de contacto
+
+### PREVIA
+- Al enviar el formulario, el resultado ("Mensaje enviado" / "Algo ha
+  fallado") aparecía como un `<p>` normal sin `aria-live` ni `role="status"`:
+  un usuario de lector de pantalla no recibía ningún aviso de que el envío
+  había terminado, ni si había ido bien o mal — tenía que volver a explorar
+  la página a ciegas para enterarse.
+- Bug de consistencia encontrado de paso: el mensaje de error usaba solo la
+  clase `form-note` (texto en el color neutro `--text-dim`), no
+  `form-note-error` (rojo, ya definida en `globals.css` y usada en la
+  página de TikTok) — el error de contacto se veía visualmente igual que un
+  mensaje de éxito.
+
+### Cambios
+- Los mensajes de resultado ahora viven dentro de un contenedor
+  `role="status" aria-live="polite"` que permanece montado en el DOM (solo
+  cambia su contenido), para que los lectores de pantalla anuncien el
+  resultado en cuanto llega.
+- El mensaje de error del formulario de contacto ahora usa
+  `form-note-error`, igual que el resto de mensajes de error del sitio.
+
+### POSTERIOR
+- Un usuario de lector de pantalla que envíe el formulario se entera del
+  resultado sin tener que volver a navegar la página.
+- El mensaje de error de contacto ya se ve visualmente distinto del de
+  éxito, coherente con el resto de la web.
+- No verificado con lector de pantalla real, igual que en ciclos anteriores
+  de accesibilidad.
+- Verificado con `npm run build`.
+
+---
+
+## Ciclo 11 — `lib/twitch.js` y `lib/youtube.js`: peticiones sin timeout
+
+### PREVIA
+- Ninguna de las llamadas `fetch` a las APIs de Twitch/YouTube tenía límite
+  de tiempo. Si Google o Twitch se quedaban colgados o respondían muy
+  lento, la petición del servidor podía quedarse esperando indefinidamente.
+  En la práctica esto significa que el skeleton de carga añadido en el
+  Ciclo 5 (o el "Comprobando directo…") se podría quedar girando para
+  siempre en vez de caer al estado de error ya implementado — el manejo de
+  errores existía, pero solo cubría "la API respondió con fallo", no
+  "la API nunca respondió".
+
+### Cambios
+- Todas las llamadas `fetch` de `lib/youtube.js` y `lib/twitch.js` llevan
+  ahora `signal: AbortSignal.timeout(8000)`. Al superar los 8s, el `fetch`
+  lanza y el `try/catch` que ya existía en cada ruta API (`/api/social/*`)
+  lo convierte en un 500/503 normal, que el frontend ya sabía interpretar
+  como estado de error.
+
+### POSTERIOR
+- Una API externa colgada ya no puede dejar el skeleton de carga girando
+  indefinidamente: como mucho 8 segundos antes de caer al estado de error
+  que ya existía en la UI.
+- No se ha podido probar el caso real de "API externa colgada" (no hay
+  forma de simularlo sin acceso a inyectar latencia en Twitch/Google) —
+  verificado por lectura de código y por el hecho de que el resto del
+  manejo de errores ya cubre la ruta de fallo.
+- Verificado con `npm run build`.
+
+---
+
+## Ciclo 12 — Bug de layout: menú móvil se solapa con el banner "en directo"
+
+### PREVIA
+- Descartado antes de empezar: pasar `Reveal.js`/las animaciones simples de
+  Framer Motion a CSS puro para "aligerar el bundle" no aporta nada real —
+  Framer Motion ya se carga en todas las páginas de todos modos porque
+  `PageTransition.js` y `LiveWidget.js` (montados en `layout.js`) lo usan
+  siempre. Quitarlo de `Reveal` añadiría código sin bajar ni un KB del
+  bundle compartido. Se descarta explícitamente para no hacer relleno.
+- Bug real encontrado en su lugar: en móvil, el panel desplegable del menú
+  (`.navlinks`) está anclado con `top:64px` fijo, asumiendo que esa es
+  siempre la altura del header. Pero cuando el banner "EN DIRECTO" del
+  Ciclo 5/anterior está activo, el header se desplaza a `top:36px` y pasa a
+  ocupar hasta ~100px de alto — el menú desplegado seguía apareciendo a
+  64px, solapándose visualmente con la parte baja del header mientras hay
+  directo y el visitante abre el menú en móvil.
+
+### Cambios
+- `body.live-banner-active .navlinks{ top:100px; }` dentro del media query
+  móvil, con una transición de `top` a juego con el resto de movimientos
+  del header.
+
+### POSTERIOR
+- El menú móvil ya no se solapa con el header cuando hay un directo activo
+  y el banner está visible — se desplaza igual que el propio header.
+- Verificado con `npm run build`. No se ha podido verificar visualmente en
+  un dispositivo real con un directo activo simultáneamente (depende de que
+  Twitch esté en directo en el momento de la prueba); la corrección se basa
+  en el cálculo de alturas del propio CSS, no en una captura visual.
+
+---
+
+## Ciclo 13 — Cabeceras de seguridad básicas ausentes
+
+### PREVIA
+- `next.config.js` no fijaba ninguna cabecera de seguridad: sin
+  `X-Content-Type-Options`, sin `Referrer-Policy`, sin `X-Frame-Options`,
+  sin `Permissions-Policy`. Nada roto de cara al usuario, pero es la
+  higiene básica que cualquier auditoría (o el propio Lighthouse/Security
+  Headers checker) señalaría de inmediato.
+
+### Cambios
+- Añadido un bloque `headers()` en `next.config.js` aplicado a todas las
+  rutas: `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: strict-origin-when-cross-origin`,
+  `X-Frame-Options: SAMEORIGIN`, y `Permissions-Policy` bloqueando
+  cámara/micrófono/geolocalización (el sitio no usa ninguno).
+
+### No implementado — decisión pendiente del usuario
+- **No he añadido una Content-Security-Policy.** Sería lo siguiente lógico,
+  pero una CSP mal calibrada puede romper en producción cosas que aquí sí
+  se usan de verdad: la hoja de estilos de Google Fonts, los estilos
+  inline que inyecta Framer Motion, y el iframe de embed de Twitch. Definir
+  una CSP correcta requiere probarla contra el sitio desplegado de verdad
+  (no solo en local) para no arriesgarme a romper el embed en directo sin
+  poder verlo. Lo dejo señalado en vez de improvisar una CSP a ciegas.
+
+### POSTERIOR
+- El sitio ya envía las cabeceras de seguridad básicas — verificado en
+  caliente con `curl -I` contra el servidor de desarrollo, no solo leído en
+  el código.
+- Verificado con `npm run build`.
+
+---
+
+## Ciclo 14 — Regresión propia: el live-float se podía arrastrar fuera de la pantalla
+
+### PREVIA
+- Descartado antes de empezar: auditar el `alt=""` de las imágenes
+  (thumbnails, avatar de TikTok) — están todas seguidas de un `<h3>` con el
+  mismo texto que describiría la imagen, así que `alt=""` es el patrón
+  correcto (evita que el lector de pantalla anuncie el título dos veces),
+  no un bug. Se descarta para no inventar trabajo donde ya está bien hecho.
+- Bug real encontrado, y es mío: al refactorizar `LiveWidget.js` en el
+  Ciclo 5 para soportar el movimiento por teclado, quité los
+  `dragConstraints` que limitaban hasta dónde se podía arrastrar el panel
+  flotante con el ratón (los llevaba desde que se creó el componente). El
+  resultado: se podía arrastrar completamente fuera de la pantalla y
+  quedaba inalcanzable con el ratón — solo `Escape` (si el usuario sabía
+  que existía esa tecla) permitía recuperarlo. Las flechas de teclado
+  tampoco tenían límite, así que también se podían "perder" el panel con
+  el teclado.
+
+### Cambios
+- Vuelven los límites de arrastre (`dragConstraints`), ahora calculados
+  respecto a la posición base del panel (esquina superior derecha) en vez
+  de a coordenadas absolutas de pantalla.
+- El mismo cálculo de límites se aplica al desplazamiento por teclado
+  (`ArrowUp/Down/Left/Right`), así que tampoco se puede sacar el panel de
+  la pantalla a base de pulsar flechas.
+
+### POSTERIOR
+- El mini-reproductor ya no se puede perder fuera del área visible ni con
+  ratón ni con teclado — se puede mover con libertad dentro de un margen de
+  8px de cada borde.
+- Verificado con `npm run build`. No se ha probado arrastrando físicamente
+  en un navegador real dentro de esta sesión — la corrección se basa en
+  revisar la lógica de límites, no en una prueba manual de arrastre.
+
+---
+
+## Ciclo 15 — Variable de entorno introducida sin documentar
+
+### PREVIA
+- El Ciclo 1 introdujo `NEXT_PUBLIC_SITE_URL` (usada en `layout.js`,
+  `sitemap.js` y `robots.js` como primera opción antes de caer a las
+  variables automáticas de Vercel), pero nunca se añadió a `.env.example`
+  — quien fuera a configurar el proyecto desde cero no tenía forma de saber
+  que esa variable existía ni para qué servía.
+
+### Cambios
+- Añadida a `.env.example` con un comentario explicando qué hace y cuál es
+  el fallback automático si no se define.
+
+### POSTERIOR
+- `.env.example` vuelve a reflejar de verdad todas las variables que el
+  código usa. No hay build ni comportamiento que verificar aquí más allá de
+  que el archivo es texto plano correcto.
+
+---
+
+## Ciclo 16 — El formulario de contacto no tenía ninguna protección anti-spam
+
+### PREVIA
+- `POST /api/contacto` insertaba en Supabase cualquier envío sin límite de
+  tamaño ni ningún mecanismo anti-bot: ni honeypot, ni rate limiting, ni
+  captcha. Un bot simple que descubra el endpoint podría llenar la tabla
+  `contact_messages` sin fricción, y un payload enorme en `mensaje` se
+  guardaría igualmente.
+
+### Cambios
+- Campo honeypot (`empresa`) añadido al formulario: invisible para
+  personas (desplazado fuera de pantalla con CSS, no `display:none`, para
+  no ser tan trivial de detectar por bots que sí comprueban eso) pero
+  presente en el HTML, donde los bots de autorrelleno suelen caer. Si llega
+  relleno, la API responde `{ ok: true }` sin insertar nada — no delata el
+  mecanismo al bot.
+- Límite de tamaño server-side: 200 caracteres para nombre/email, 5000 para
+  el mensaje (con `maxLength` a juego en el `<textarea>` del cliente).
+
+### No implementado — decisión pendiente del usuario
+- No hay rate limiting (por IP o similar): un bot que ignore el honeypot y
+  mande cientos de peticiones seguidas no encontraría ningún límite. Añadir
+  eso bien (con estado compartido entre invocaciones serverless) normalmente
+  se apoya en Redis/Upstash o en el rate limiting nativo de Vercel — no lo
+  he montado porque implica decidir y provisionar infraestructura nueva,
+  no es un cambio de código autocontenido como el resto de este ciclo.
+
+### POSTERIOR
+- Verificado en caliente (no solo por lectura de código): una petición con
+  el campo honeypot relleno devuelve `{"ok":true}` sin tocar la base de
+  datos, y una petición con un mensaje de 6000 caracteres devuelve 400.
+- Verificado con `npm run build`.
+
+---

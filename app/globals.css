@@ -142,9 +142,10 @@ nav{
 .navlinks a:hover{color:var(--magenta);}
 .navtoggle{display:none; background:none; border:none; color:var(--text); font-size:1.4rem; cursor:pointer;}
 @media (max-width:720px){
-  .navlinks{position:fixed; top:64px; left:0; right:0; background:var(--bg-alt); flex-direction:column; padding:20px 24px; gap:18px; border-bottom:1px solid var(--line); transform:translateY(-110%); transition:transform .25s; }
+  .navlinks{position:fixed; top:64px; left:0; right:0; background:var(--bg-alt); flex-direction:column; padding:20px 24px; gap:18px; border-bottom:1px solid var(--line); transform:translateY(-110%); transition:transform .25s, top .3s var(--ease-arcane); }
   .navlinks.open{transform:translateY(0);}
   .navtoggle{display:block;}
+  body.live-banner-active .navlinks{top:100px;}
 }
 
 /* ---------- HERO ---------- */
@@ -348,6 +349,7 @@ section{padding:90px 24px; position:relative;}
 .card a.cta{font-family:'JetBrains Mono',monospace; font-size:.82rem; color:var(--gold-soft); border-bottom:1px solid var(--gold-soft); padding-bottom:2px;}
 
 .price{font-family:'JetBrains Mono',monospace; color:var(--gold-soft); font-size:1.05rem; margin-bottom:14px;}
+.cta-disabled{color:var(--text-dim); border-bottom-color:transparent; cursor:default;}
 
 /* social */
 .social-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; max-width:760px; margin:0 auto;}
@@ -372,6 +374,7 @@ input:focus, textarea:focus{border-color:var(--hex);}
 textarea{resize:vertical; min-height:120px;}
 .form-note{font-size:.78rem; color:var(--text-dim); margin-top:-4px;}
 .form-note-error{color:#e08585;}
+.honeypot{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;}
 
 footer{
   position:relative; text-align:center; padding:0 24px 40px;

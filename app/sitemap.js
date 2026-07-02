@@ -5,7 +5,7 @@ const SITE_URL =
   'http://localhost:3000';
 
 export default function sitemap() {
-  const routes = ['', '/tienda', '/tiktok', '/contacto', '/privacidad', '/terminos'];
+  const routes = ['', '/tienda', '/contacto', '/privacidad', '/terminos'];
 
   return routes.map((route) => ({
     url: `${SITE_URL}${route}`,
