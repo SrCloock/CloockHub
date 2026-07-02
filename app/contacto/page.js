@@ -44,25 +44,27 @@ export default function Contacto() {
             </div>
           </Reveal>
           <Reveal delay={0.1}>
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="nombre">Nombre</label>
-                <input id="nombre" name="nombre" type="text" placeholder="Tu nombre" required />
-              </div>
-              <div>
-                <label htmlFor="email">Email</label>
-                <input id="email" name="email" type="email" placeholder="tu@email.com" required />
-              </div>
-              <div>
-                <label htmlFor="mensaje">Mensaje</label>
-                <textarea id="mensaje" name="mensaje" placeholder="Escribe aquí..." required />
-              </div>
-              <button type="submit" className="btn btn-gold" style={{ border: 'none' }} disabled={status === 'sending'}>
-                {status === 'sending' ? 'Enviando…' : 'Enviar mensaje'}
-              </button>
-              {status === 'sent' && <p className="form-note">Mensaje enviado, ¡gracias! Te responderé en cuanto pueda.</p>}
-              {status === 'error' && <p className="form-note">Algo ha fallado al enviar el mensaje. Inténtalo de nuevo en un momento.</p>}
-            </form>
+            <div className="form-panel">
+              <form onSubmit={handleSubmit}>
+                <div>
+                  <label htmlFor="nombre">Nombre</label>
+                  <input id="nombre" name="nombre" type="text" placeholder="Tu nombre" required />
+                </div>
+                <div>
+                  <label htmlFor="email">Email</label>
+                  <input id="email" name="email" type="email" placeholder="tu@email.com" required />
+                </div>
+                <div>
+                  <label htmlFor="mensaje">Mensaje</label>
+                  <textarea id="mensaje" name="mensaje" placeholder="Escribe aquí..." required />
+                </div>
+                <button type="submit" className="btn btn-gold" disabled={status === 'sending'}>
+                  {status === 'sending' ? 'Enviando…' : 'Enviar mensaje'}
+                </button>
+                {status === 'sent' && <p className="form-note">Mensaje enviado, ¡gracias! Te responderé en cuanto pueda.</p>}
+                {status === 'error' && <p className="form-note">Algo ha fallado al enviar el mensaje. Inténtalo de nuevo en un momento.</p>}
+              </form>
+            </div>
           </Reveal>
         </div>
       </section>

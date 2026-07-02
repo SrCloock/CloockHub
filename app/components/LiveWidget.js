@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls, useMotionValue } from 'framer-motion';
 
 const TWITCH_LOGIN = 'srcloock';
 const TWITCH_URL = `https://www.twitch.tv/${TWITCH_LOGIN}`;
+const NUDGE = 24;
 
 export default function LiveWidget() {
   const [live, setLive] = useState(false);
@@ -12,6 +13,8 @@ export default function LiveWidget() {
   const [closed, setClosed] = useState(false);
   const [hostname, setHostname] = useState('');
   const dragControls = useDragControls();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
   useEffect(() => {
     setHostname(window.location.hostname);
@@ -36,11 +39,34 @@ export default function LiveWidget() {
     return () => window.removeEventListener('scroll', onScroll);
   }, [live]);
 
+  useEffect(() => {
+    if (!floating) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setClosed(true);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [floating]);
+
   if (!live || closed) return null;
 
   const embedSrc = hostname
     ? `https://player.twitch.tv/?channel=${TWITCH_LOGIN}&parent=${hostname}&autoplay=true&muted=true`
     : null;
+
+  const handleKeyDown = (e) => {
+    const deltas = {
+      ArrowUp: [0, -NUDGE],
+      ArrowDown: [0, NUDGE],
+      ArrowLeft: [-NUDGE, 0],
+      ArrowRight: [NUDGE, 0],
+    };
+    const delta = deltas[e.key];
+    if (!delta) return;
+    e.preventDefault();
+    x.set(x.get() + delta[0]);
+    y.set(y.get() + delta[1]);
+  };
 
   return (
     <AnimatePresence>
@@ -65,18 +91,27 @@ export default function LiveWidget() {
         <motion.div
           key="live-float"
           className="live-float"
+          role="dialog"
+          aria-label={`Reproductor de directo minimizado — ${live.title}`}
+          style={{ x, y }}
           drag
           dragListener={false}
           dragControls={dragControls}
           dragMomentum={false}
           dragElastic={0}
-          dragConstraints={{ top: 8, left: 8, right: window.innerWidth - 316, bottom: window.innerHeight - 210 }}
-          initial={{ scale: 0.85, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.85, opacity: 0, y: 20 }}
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.85, opacity: 0 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="live-float-head" onPointerDown={(e) => dragControls.start(e)}>
+          <div
+            className="live-float-head"
+            role="button"
+            tabIndex={0}
+            aria-label="Arrastra o usa las flechas del teclado para mover el reproductor"
+            onPointerDown={(e) => dragControls.start(e)}
+            onKeyDown={handleKeyDown}
+          >
             <span className="live-dot" />
             <a href={TWITCH_URL} target="_blank" rel="noreferrer" className="live-float-title">
               {live.title}
