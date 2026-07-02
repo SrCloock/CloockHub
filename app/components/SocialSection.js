@@ -94,7 +94,7 @@ export default function SocialSection() {
       <div className="social-grid">
         {SOCIALS.map((s, i) => (
           <Reveal delay={i * 0.06} key={s.name}>
-            <a href={s.url} target="_blank" rel="noreferrer" className="social-item">
+            <a href={s.url} target="_blank" rel="noreferrer" className="social-item glitch-hover">
               {s.name}
               <span className="platform">{s.handle}</span>
             </a>

@@ -12,6 +12,10 @@ export default function Home() {
       <Header />
 
       <section className="hero">
+        <span className="particle" style={{ width: 4, height: 4, left: '18%', top: '30%', background: 'var(--gold-soft)', boxShadow: '0 0 12px var(--gold-soft)', animationDelay: '0s' }} />
+        <span className="particle" style={{ width: 6, height: 6, left: '78%', top: '22%', background: 'var(--hex)', boxShadow: '0 0 14px var(--hex)', animationDelay: '1.5s' }} />
+        <span className="particle" style={{ width: 3, height: 3, left: '62%', top: '68%', background: 'var(--magenta)', boxShadow: '0 0 10px var(--magenta)', animationDelay: '3s' }} />
+        <span className="particle" style={{ width: 5, height: 5, left: '30%', top: '75%', background: 'var(--shimmer)', boxShadow: '0 0 12px var(--shimmer)', animationDelay: '4.5s' }} />
         <div className="hero-inner">
           <motion.svg
             className="shard"

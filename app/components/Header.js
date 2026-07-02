@@ -32,7 +32,7 @@ export default function Header() {
         <button className="navtoggle" aria-label="Abrir menú" onClick={() => setNavOpen(!navOpen)}>☰</button>
         <div className={`navlinks ${navOpen ? 'open' : ''}`}>
           {LINKS.map((link) => (
-            <Link key={link.label} href={resolveHref(link.href)} onClick={() => setNavOpen(false)}>
+            <Link key={link.label} className="glitch-hover" href={resolveHref(link.href)} onClick={() => setNavOpen(false)}>
               {link.label}
             </Link>
           ))}
