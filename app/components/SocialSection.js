@@ -14,6 +14,13 @@ const SOCIALS = [
 const TWITCH_URL = 'https://www.twitch.tv/srcloock';
 const YOUTUBE_URL = 'https://www.youtube.com/@SrCloockZ';
 
+function isToday(dateString) {
+  if (!dateString) return false;
+  const d = new Date(dateString);
+  const now = new Date();
+  return d.toDateString() === now.toDateString();
+}
+
 export default function SocialSection() {
   const [twitch, setTwitch] = useState({ status: 'loading' });
   const [youtube, setYoutube] = useState({ status: 'loading' });
@@ -79,6 +86,7 @@ export default function SocialSection() {
           <div className="grid3" style={{ marginBottom: 40 }}>
             {youtube.videos.slice(0, 3).map((v) => (
               <a href={v.url} target="_blank" rel="noreferrer" className="card" key={v.id}>
+                {isToday(v.publishedAt) && <span className="tagchip new-badge">● Último vídeo</span>}
                 {v.thumbnailUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={v.thumbnailUrl} alt="" className="video-thumb" />

@@ -59,7 +59,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
           >
-            Proyectos, apps y un universo propio — placeholder de descripción, cámbiame por tu bio real.
+            Streaming y contenido, en directo y bajo demanda.
           </motion.p>
 
           <motion.div
@@ -68,8 +68,8 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <a href="#proyectos" className="btn btn-gold">Ver proyectos</a>
-            <a href="#redes" className="btn btn-ghost">Síguenos</a>
+            <a href="#redes" className="btn btn-gold">Ver directo</a>
+            <a href="/tienda" className="btn btn-ghost">Ir a la tienda</a>
           </motion.div>
         </div>
       </section>
@@ -95,40 +95,12 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
             <div className="about-grid">
-              <div className="about-portrait">[ tu foto o avatar aquí ]</div>
+              <div className="about-portrait">[ foto ]</div>
               <div className="about-text">
-                <p>Placeholder: cuéntale a la gente quién eres, qué construyes y por qué. Dos o tres frases bastan — directas, con tu voz.</p>
-                <p>Placeholder: menciona tu enfoque (apps, diseño, contenido...) y qué pueden esperar al seguirte.</p>
+                <p>Bio pendiente — texto definitivo por confirmar.</p>
               </div>
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      <section id="proyectos">
-        <div className="wrap">
-          <Reveal>
-            <div className="section-head">
-              <span className="eyebrow">// laboratorio</span>
-              <h2>Proyectos & Apps</h2>
-            </div>
-          </Reveal>
-          <div className="grid3">
-            {[
-              { tag: 'App', title: 'Nombre del proyecto 1' },
-              { tag: 'Web', title: 'Nombre del proyecto 2' },
-              { tag: 'Tool', title: 'Nombre del proyecto 3' },
-            ].map((p, i) => (
-              <Reveal delay={i * 0.1} key={p.title}>
-                <div className="card">
-                  <span className="tagchip">{p.tag}</span>
-                  <h3>{p.title}</h3>
-                  <p>Descripción breve placeholder de qué hace esta app o proyecto.</p>
-                  <a href="#" className="cta">Ver más →</a>
-                </div>
-              </Reveal>
-            ))}
-          </div>
         </div>
       </section>
 

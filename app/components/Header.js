@@ -6,8 +6,7 @@ import { usePathname } from 'next/navigation';
 
 const LINKS = [
   { href: '#sobre-mi', label: 'Sobre mí' },
-  { href: '#proyectos', label: 'Proyectos' },
-  { href: '#redes', label: 'Redes' },
+  { href: '#redes', label: 'Streaming' },
   { href: '/tienda', label: 'Tienda' },
   { href: '/tiktok', label: 'TikTok' },
   { href: '/contacto', label: 'Contacto' },
