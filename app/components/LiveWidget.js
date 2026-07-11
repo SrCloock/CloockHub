@@ -84,7 +84,7 @@ export default function LiveWidget() {
           href={TWITCH_URL}
           target="_blank"
           rel="noreferrer"
-          className="live-banner glitch-hover"
+          className="live-banner"
           initial={{ y: -40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -40, opacity: 0 }}
@@ -140,6 +140,7 @@ export default function LiveWidget() {
             src={embedSrc}
             title="SrCloock en directo — Twitch"
             allowFullScreen
+            loading="lazy"
             frameBorder="0"
           />
         </motion.div>

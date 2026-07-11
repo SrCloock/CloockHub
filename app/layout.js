@@ -1,7 +1,21 @@
 import './globals.css';
+import { Inter, Space_Grotesk } from 'next/font/google';
 import PageTransition from './components/PageTransition';
 import CursorGlow from './components/CursorGlow';
 import LiveWidget from './components/LiveWidget';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const grotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  variable: '--font-grotesk',
+  display: 'swap',
+});
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -30,17 +44,15 @@ export const metadata = {
   },
 };
 
+export const viewport = {
+  themeColor: '#05070c',
+};
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="es" className={`${inter.variable} ${grotesk.variable}`}>
       <body>
+        <a href="#contenido" className="skip-link">Saltar al contenido</a>
         <CursorGlow />
         <LiveWidget />
         <PageTransition>{children}</PageTransition>

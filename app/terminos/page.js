@@ -10,9 +10,10 @@ export default function Terminos() {
     <>
       <Header />
       <section className="page-section">
+        <div className="page-glow" aria-hidden="true" />
         <div className="wrap legal">
           <div className="section-head">
-            <span className="eyebrow">// legal</span>
+            <span className="eyebrow">Legal</span>
             <h2>Términos de Servicio</h2>
           </div>
 

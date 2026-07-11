@@ -10,9 +10,10 @@ export default function Privacidad() {
     <>
       <Header />
       <section className="page-section">
+        <div className="page-glow" aria-hidden="true" />
         <div className="wrap legal">
           <div className="section-head">
-            <span className="eyebrow">// legal</span>
+            <span className="eyebrow">Legal</span>
             <h2>Política de Privacidad</h2>
           </div>
 

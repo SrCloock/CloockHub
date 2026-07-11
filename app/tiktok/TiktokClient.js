@@ -171,9 +171,10 @@ export default function TikTokPage() {
     <>
       <Header />
       <section className="page-section">
+        <div className="page-glow" aria-hidden="true" />
         <div className="wrap legal">
           <div className="section-head" style={{ textAlign: 'center' }}>
-            <span className="eyebrow">// integración</span>
+            <span className="eyebrow">Integración</span>
             <h2>TikTok</h2>
           </div>
 
@@ -195,7 +196,7 @@ export default function TikTokPage() {
               <div className="card" style={{ textAlign: 'center' }}>
                 <h3>Conecta tu cuenta de TikTok</h3>
                 <p>Inicia sesión para ver tu perfil, tus vídeos y publicar contenido nuevo.</p>
-                <a href="/api/tiktok/login" className="btn btn-gold">Conectar con TikTok</a>
+                <a href="/api/tiktok/login" className="btn btn-primary">Conectar con TikTok</a>
                 {me.error && <p className="form-note form-note-error" style={{ marginTop: 16 }}>Error: {me.error}</p>}
               </div>
             </Reveal>
@@ -299,7 +300,7 @@ export default function TikTokPage() {
                     <span>Confirmo que tengo los derechos necesarios de la música/audio de este vídeo, según los Términos de Música de TikTok.</span>
                   </label>
 
-                  <button type="submit" className="btn btn-gold" style={{ border: 'none' }} disabled={submitting}>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
                     {submitting ? 'Publicando…' : 'Publicar en TikTok'}
                   </button>
                   {publishStatus && <p className="form-note">{STATUS_LABELS[publishStatus] || publishStatus}</p>}
